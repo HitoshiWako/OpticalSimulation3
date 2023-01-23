@@ -24,7 +24,7 @@ def characteristic_matrix(n,d,n0,angle,lam):
 
 def reflectance(param, eta0):
     def _reflectance(param, eta0):
-        return np.abs((eta0*param[0]-param[1])/(eta0*param[0]+param[1]))**2
+        return (np.abs((eta0*param[0]-param[1])/(eta0*param[0]+param[1]))**2)[0]
     return tuple(map(_reflectance,param,eta0))
 
 def calc_matrix(layers,n0,angle,lam):
@@ -35,5 +35,5 @@ def calc_matrix(layers,n0,angle,lam):
 
 def transmittance(param,eta0,eta_s):
     def _transmittance(param,eta0,eta_s):
-        return 4*eta0*eta_s.real/np.abs(eta0*param[0]+param[1])**2
+        return (4*eta0*eta_s.real/np.abs(eta0*param[0]+param[1])**2)[0]
     return tuple(map(_transmittance, param, eta0,eta_s))
