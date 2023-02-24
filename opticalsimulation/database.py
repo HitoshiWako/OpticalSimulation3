@@ -1,7 +1,7 @@
 import requests
 from sqlalchemy.orm import sessionmaker
-from settings import Engine
-from models import Material, OpticalIndex
+from .settings import Engine
+from .models import Material, OpticalIndex
 
 Session = sessionmaker(bind=Engine)
 
@@ -35,7 +35,7 @@ def get_data(name):
     opticalindexes = session.query(OpticalIndex).\
                              join(Material,OpticalIndex.material_id == Material.id).\
                              filter_by(name=name).order_by(OpticalIndex.wavelength).all()
-    result = [(opticalindex.wavelength, complex(opticalindex.n,opticalindex.k)) for opticalindex in opticalindexes]
+    result = [(opticalindex.wavelength, complex(opticalindex.n,-opticalindex.k)) for opticalindex in opticalindexes]
     session.close()
     return result
 

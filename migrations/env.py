@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from settings import Base
-from models import Material, OpticalIndex
+from opticalsimulation.settings import Base
+from opticalsimulation.models import Material, OpticalIndex
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
