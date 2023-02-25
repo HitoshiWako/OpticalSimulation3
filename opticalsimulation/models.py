@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, String
 
-from .settings import Base
+from opticalsimulation.settings import Base
 
 class Material(Base):
     __tablename__ = 'material'

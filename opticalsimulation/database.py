@@ -4,8 +4,8 @@ import numpy as np
 from sqlalchemy.orm import sessionmaker
 from scipy import interpolate
 
-from .settings import Engine
-from .models import Material, OpticalIndex
+from opticalsimulation.settings import Engine
+from opticalsimulation.models import Material, OpticalIndex
 
 Session = sessionmaker(bind=Engine)
 
