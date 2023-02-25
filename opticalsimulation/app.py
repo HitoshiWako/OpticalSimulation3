@@ -6,7 +6,7 @@ import plotly.express as px
 import pandas as pd
 import dash_bootstrap_components as dbc
 
-app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = Dash(external_stylesheets=[dbc.themes.SPACELAB])
 #app = Dash(__name__)
 
 # assume you have a "long-form" data frame
