@@ -2,11 +2,14 @@ from dash import Dash, html,dcc
 import numpy as np
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
+import opticalsimulation.database as db
 
-x = np.arange(10)
-fig = go.Figure(
-    data=go.Scatter(x=x,y=x**2,mode='lines')
-)
+nks = db.get_opticalindex(1)
+ns = [nk.real for nk in nks[1]]
+ks = [-nk.imag for nk in nks[1]]
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=nks[0],y=ns,mode='lines'))
+fig.add_trace(go.Scatter(x=nks[0],y=ks,mode='lines'))
 
 app = Dash(external_stylesheets=[dbc.themes.SPACELAB])
 
