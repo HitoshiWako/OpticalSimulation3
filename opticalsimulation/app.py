@@ -4,8 +4,10 @@
 from dash import Dash, html, dcc
 import plotly.express as px
 import pandas as pd
+import dash_bootstrap_components as dbc
 
-app = Dash(__name__)
+app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+#app = Dash(__name__)
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
