@@ -1,5 +1,6 @@
 from dash import Dash, html,dcc, dash_table,Input,Output,State,ctx
 import numpy as np
+import requests
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import opticalsimulation.database as db
@@ -12,6 +13,7 @@ app = Dash(external_stylesheets=[dbc.themes.SPACELAB])
 app.layout = dbc.Container([
     html.H1("Optical Index"),
     html.Hr(),
+    dbc.Alert('Illigal URL',id='url_alert',is_open=False,duration=2000),
     dbc.Col(dcc.Graph(id='nk_graph')),
     dbc.Row([
         dbc.Col([dbc.Input(id='input_url',placeholder='Input URL',type='url')]),
@@ -22,19 +24,28 @@ app.layout = dbc.Container([
                          data = [],
                          columns=[{"id":"name","name":"Material"}],
                          style_cell={'textAlign':'left'},
-                         row_selectable='single')
+                         row_selectable='single'),
+    html.Br()
 ])
 
 @app.callback(
     Output('material_list_table','data'),
     Output('input_url','value'),
+    Output('url_alert','is_open'),
     Input('input_button','n_clicks'),
     State('input_url','value')
 )
 def load_new_material(n_clicks,url):
+    is_open = False
     if 'input_button' == ctx.triggered_id:
-        db.add_opticalindex(url)
-    return [{'id':d[0],'name':d[1]} for d in db.get_material_list()],''
+        if url.rsplit('/',1)[0] == 'https://www.filmetricsinc.jp/technology/refractive-index-database/download':
+            try:
+                db.add_opticalindex(url)
+            except requests.exceptions.RequestException as e:
+                is_open = True
+        else:
+            is_open = True
+    return [{'id':d[0],'name':d[1]} for d in db.get_material_list()],'',is_open
 
 @app.callback(
     Output('nk_graph','figure'),
