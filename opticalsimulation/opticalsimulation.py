@@ -56,12 +56,12 @@ def calc_matrix(ns,ds,n0,n1,theta,lam):
 
 def transmittance(param,eta0,eta_s):
     def _transmittance(param,eta0,eta_s):
-        return (4*eta0*eta_s.real/np.abs(eta0*param[0]+param[1])**2)[0]
+        return (4*eta0.real*eta_s.real/np.abs(eta0*param[0]+param[1])**2)[0]
     return tuple(map(_transmittance, param, eta0,eta_s))
 
 def absorb(n1,thickness,n0,theta,lam):
     phi = snell(n1,n0,theta)
-    return np.abs(np.exp(-8*np.pi*np.abs(n1.imag)*thickness*1000/(lam*np.cos(phi))))
+    return np.exp(-8*np.pi*np.abs(n1.imag)*thickness*1000/(lam*np.cos(phi)))
 
 def calc_spectra(n0,n1,n2,theta,front_ns,front_ds,back_ns,back_ds,t_sub, lam):
      f_ns = copy(front_ns)
@@ -93,7 +93,6 @@ def calc_spectra(n0,n1,n2,theta,front_ns,front_ds,back_ns,back_ds,t_sub, lam):
      
      r12 = reflectance(back_backward,eta1)
      t12 = transmittance(back_backward,eta1,eta2) 
-
 
      beta = absorb(n1,t_sub,n0,theta,lam)
 
