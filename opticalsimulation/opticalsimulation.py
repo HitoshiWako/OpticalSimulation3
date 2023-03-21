@@ -61,7 +61,7 @@ def transmittance(param,eta0,eta_s):
 
 def absorb(n1,thickness,n0,theta,lam):
     phi = snell(n1,n0,theta)
-    return np.exp(-8*np.pi*np.abs(n1.imag)*thickness*1000/(lam*np.cos(phi)))
+    return np.abs(np.exp(-8*np.pi*np.abs(n1.imag)*thickness*1000/(lam*np.cos(phi))))
 
 def calc_spectra(n0,n1,n2,theta,front_ns,front_ds,back_ns,back_ds,t_sub, lam):
      f_ns = copy(front_ns)
