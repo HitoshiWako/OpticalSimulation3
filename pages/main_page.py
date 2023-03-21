@@ -57,7 +57,7 @@ layout = dbc.Container([
                 dbc.InputGroup([
                     dbc.InputGroupText('Thcikness'),
                     dbc.Input(id='substrate-thickness',type='number',min=0),
-                    dbc.InputGroupText('mm')
+                    dbc.InputGroupText('um')
                 ], style={'padding-top':10}),
             ])
         ],width=3)
@@ -89,13 +89,13 @@ def update_angle(angle,substrate,thickness):
         n2 = 1
         n1 = np.array(db.fitted_opticalindex(substrate,min_wl,max_wl,step))
         if thickness is not None:            
-            ref1,trans,ref2,_ = op.calc_spectra(n0,n1,n2,angle,[],[],[],[],thickness,wl)
+            ref1,_,ref2,trans = op.calc_spectra(n0,n1,n2,angle,[],[],[],[],thickness,wl)
             fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines'))
             fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines'))
             fig_trans.add_trace(go.Scatter(x=wl,y=trans[0], mode='lines'))
             fig_trans.add_trace(go.Scatter(x=wl,y=trans[1], mode='lines'))
-            fig_ref2.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines'))
-            fig_ref2.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=ref2[0], mode='lines'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=ref2[1], mode='lines'))
         else:
             thickness=1
             ref1,trans,_,_ = op.calc_spectra(n0,n1,n2,angle,[],[],[],[],thickness,wl)
