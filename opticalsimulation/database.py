@@ -2,6 +2,7 @@ import requests
 import numpy as np
 
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import func
 from scipy import interpolate
 
 from opticalsimulation.settings import Engine
@@ -67,7 +68,6 @@ def fitted_opticalindex(id,start,end,step):
     return []
 
 def delete_opticalindex(id):
-    Session = sessionmaker(bind=Engine)
     session = Session()
     q = session.query(Material).filter_by(id=id).one_or_none()
     if q is not None:
@@ -75,4 +75,11 @@ def delete_opticalindex(id):
         session.delete(q)
         session.commit()
     session.close()
+
+def get_range(id):
+    session = Session()
+    q = session.query(func.min(OpticalIndex.wavelength).label('min'),func.max(OpticalIndex.wavelength).label('max')).filter_by(material_id=id).one_or_none()
+    session.close()
+    return q
+
 
