@@ -96,8 +96,8 @@ def calc_spectra(n0,n1,n2,theta,front_ns,front_ds,back_ns,back_ds,t_sub, lam):
 
      beta = absorb(n1,t_sub,n0,theta,lam)
 
-     r = ((r01[0]+ t01[0]*r12[0]*t10[0]*beta)/(1-r10[0]*r12[0]*beta), 
-          (r01[1]+ t01[1]*r12[1]*t10[1]*beta)/(1-r10[1]*r12[1]*beta))
+     r = (r01[0]+ (t01[0]*r12[0]*t10[0]*beta)/(1-r10[0]*r12[0]*beta), 
+          r01[1]+ (t01[1]*r12[1]*t10[1]*beta)/(1-r10[1]*r12[1]*beta))
      t = (t01[0]*t12[0]*np.sqrt(beta)/(1-r10[0]*r12[0]*beta),
           t01[1]*t12[1]*np.sqrt(beta)/(1-r10[1]*r12[1]*beta))
 
