@@ -30,7 +30,7 @@ layout = dbc.Container([
             html.Br(),
             html.Div([
                 dbc.Label('Layers'),
-                dash_table.DataTable(id='table_layer',
+                dash_table.DataTable(id='table-layer',
                                      data=[],
                                      columns=[{'id':'name','name':'Material','presentation':'dropdown'},
                                               {'id':'thickness','name':'Thickness','type':'numeric'}],
@@ -47,7 +47,7 @@ layout = dbc.Container([
                                         }
                                      }
                 ),
-                html.Div([dbc.Button('Add Layer',id='button_add_layer',n_clicks=0,style={'margin-top':10})],
+                html.Div([dbc.Button('Add Layer',id='button-add-layer',n_clicks=0,style={'margin-top':10})],
                          className="d-md-flex justify-content-md-end"),
             ]),
             html.Br(),
@@ -72,13 +72,15 @@ layout = dbc.Container([
     Output('graph-reflect-with-back','figure'),
     Input('slider-angle','value'),
     Input('substrate','value'),
-    Input('substrate-thickness','value')
+    Input('substrate-thickness','value'),
+    Input('table-layer','data')
 )
-def update_angle(angle,substrate,thickness):
+def update_angle(angle,substrate,thickness,layers):
     fig_ref1 = go.Figure()
     fig_ref2 = go.Figure()
     fig_trans = go.Figure()
-
+    ns = []
+    ds = []
     if substrate is not None:
         wl_range = db.get_range(substrate)
         step=10
@@ -88,28 +90,34 @@ def update_angle(angle,substrate,thickness):
         n1 = np.array(db.fitted_opticalindex(substrate,wl_range.min,wl_range.max,step))
         if thickness is not None:            
             ref1,_,ref2,trans = op.calc_spectra(n0,n1,n2,angle*np.pi/180 ,[],[],[],[],thickness,wl)
-            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines'))
-            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines'))
-            fig_trans.add_trace(go.Scatter(x=wl,y=trans[0], mode='lines'))
-            fig_trans.add_trace(go.Scatter(x=wl,y=trans[1], mode='lines'))
-            fig_ref2.add_trace(go.Scatter(x=wl,y=ref2[0], mode='lines'))
-            fig_ref2.add_trace(go.Scatter(x=wl,y=ref2[1], mode='lines'))
+            fig_ref1.add_trace(go.Scatter(x=wl,y=(ref1[0]+ref1[1])/2, mode='lines',name='average'))
+            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines',name='s-polarized'))
+            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines',name='p-polarized'))
+            fig_trans.add_trace(go.Scatter(x=wl,y=(trans[0]+trans[1])/2, mode='lines',name='average'))
+            fig_trans.add_trace(go.Scatter(x=wl,y=trans[0], mode='lines',name='s-polarized'))
+            fig_trans.add_trace(go.Scatter(x=wl,y=trans[1], mode='lines',name='p-polarized'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=(ref2[0]+ref2[1])/2, mode='lines',name='average'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=ref2[0], mode='lines',name='s-polarized'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=ref2[1], mode='lines',name='p-polarized'))
         else:
             thickness=1
             ref1,trans,_,_ = op.calc_spectra(n0,n1,n2,angle*np.pi/180 ,[],[],[],[],thickness,wl)
-            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines'))
-            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines'))
-            fig_trans.add_trace(go.Scatter(x=wl,y=trans[0], mode='lines'))
-            fig_trans.add_trace(go.Scatter(x=wl,y=trans[1], mode='lines'))
-            fig_ref2.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines'))
-            fig_ref2.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines'))
+            fig_ref1.add_trace(go.Scatter(x=wl,y=(ref1[0]+ref1[1])/2, mode='lines',name='average'))
+            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines',name='s-polarized'))
+            fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines',name='p-polarized'))
+            fig_trans.add_trace(go.Scatter(x=wl,y=(trans[0]+trans[1])/2, mode='lines',name='average'))
+            fig_trans.add_trace(go.Scatter(x=wl,y=trans[0], mode='lines',name='s-polarized'))
+            fig_trans.add_trace(go.Scatter(x=wl,y=trans[1], mode='lines',name='p-polarized'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=(ref1[0]+ref1[1])/2, mode='lines',name='average'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines',name='s-polarized'))
+            fig_ref2.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines',name='p-polarized'))
     return 'Incident Angle: {:.1f}'.format(angle),fig_ref1,fig_trans,fig_ref2
 
 @callback(
-    Output('table_layer','data'),
-    Input('button_add_layer','n_clicks'),
-    State('table_layer','data'),
-    State('table_layer','columns')
+    Output('table-layer','data'),
+    Input('button-add-layer','n_clicks'),
+    State('table-layer','data'),
+    State('table-layer','columns')
 )
 def add_layer(n_clicks, data, columns):
     if n_clicks > 0:
