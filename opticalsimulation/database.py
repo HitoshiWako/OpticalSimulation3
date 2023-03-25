@@ -64,8 +64,8 @@ def fitted_opticalindex(id,start,end,step):
             n_fitted = interpolate.interp1d(ws,ns)
             k_fitted = interpolate.interp1d(ws,ks)
             x = np.arange(start,end,step)
-            return [complex(n,-k) for n,k in zip(n_fitted(x),k_fitted(x))]
-    return []
+            return np.arrray([complex(n,-k) for n,k in zip(n_fitted(x),k_fitted(x))])
+    return np.array([])
 
 def delete_opticalindex(id):
     session = Session()
@@ -80,6 +80,6 @@ def get_range(id):
     session = Session()
     q = session.query(func.min(OpticalIndex.wavelength).label('min'),func.max(OpticalIndex.wavelength).label('max')).filter_by(material_id=id).one_or_none()
     session.close()
-    return q
-
-
+    if q is not None:
+        return q.min,q.mqx
+    return None,None
