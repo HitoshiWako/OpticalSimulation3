@@ -82,12 +82,12 @@ def update_angle(angle,substrate,thickness,layers):
     ns = []
     ds = []
     if substrate is not None:
-        wl_range = db.get_range(substrate)
+        wl_min,wl_max = db.get_range(substrate)
         step=10
-        wl = np.arange(wl_range.min,wl_range.max,step)
+        wl = np.arange(wl_min,wl_max,step)
         n0 = 1
         n2 = 1
-        n1 = np.array(db.fitted_opticalindex(substrate,wl_range.min,wl_range.max,step))
+        n1 = np.array(db.fitted_opticalindex(substrate,wl_min,wl_max,step))
         if thickness is not None:            
             ref1,_,ref2,trans = op.calc_spectra(n0,n1,n2,angle*np.pi/180 ,[],[],[],[],thickness,wl)
             fig_ref1.add_trace(go.Scatter(x=wl,y=(ref1[0]+ref1[1])/2, mode='lines',name='average'))
