@@ -81,5 +81,5 @@ def get_range(id):
     q = session.query(func.min(OpticalIndex.wavelength).label('min'),func.max(OpticalIndex.wavelength).label('max')).filter_by(material_id=id).one_or_none()
     session.close()
     if q is not None:
-        return q.min,q.mqx
+        return q.min,q.max
     return None,None
