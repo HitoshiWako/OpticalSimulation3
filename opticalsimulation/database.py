@@ -64,7 +64,7 @@ def fitted_opticalindex(id,start,end,step):
             n_fitted = interpolate.interp1d(ws,ns)
             k_fitted = interpolate.interp1d(ws,ks)
             x = np.arange(start,end,step)
-            return np.arrray([complex(n,-k) for n,k in zip(n_fitted(x),k_fitted(x))])
+            return np.array([complex(n,-k) for n,k in zip(n_fitted(x),k_fitted(x))])
     return np.array([])
 
 def delete_opticalindex(id):
