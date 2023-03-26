@@ -10,60 +10,64 @@ import opticalsimulation.opticalsimulation as op
 dash.register_page(__name__,path='/')
 
 
+def serve_layout():
+    layout = dbc.Container([
+        html.H2('Spectra'),
+        dbc.Row(
+        [
+            dbc.Col([
+                dbc.Tabs([
+                    dbc.Tab(dcc.Graph(id='graph-reflect'),label='Reflectance'),
+                    dbc.Tab(dcc.Graph(id='graph-trans'),label='Transmittance'),
+                    dbc.Tab(dcc.Graph(id='graph-reflect-with-back'),label='Reflectance(with back reflection)')
+                ])
+            ]),
+            dbc.Col([
+                html.Div([
+                    dbc.Label(id='label-angle'),
+                    dcc.Slider(id='slider-angle',min=0,max=89.9,step=0.1,value=0,marks={0:'0',5:'5',12:'12',45:'45'}),
+                ]),
+                html.Br(),
+                html.Div([
+                    dbc.Label('Layers'),
+                    dash_table.DataTable(id='table-layer',
+                                         data=[],
+                                         columns=[{'id':'id','name':'Material','presentation':'dropdown'},
+                                                  {'id':'thickness','name':'Thickness','type':'numeric'}],
+                                         style_header={'textAlign':'left'},
+                                         style_cell={'height':0},
+                                         style_cell_conditional=[{
+                                            'if':{'column_id':'name'},'textAlign':'left'
+                                         }],
+                                         editable=True,
+                                         row_deletable=True,
+                                         dropdown={
+                                            'id':{
+                                                'options':[{'label':mat[1],'value':mat[0]} for mat in db.get_material_list()]
+                                            }
+                                         }
+                    ),
+                    html.Div([dbc.Button('Add Layer',id='button-add-layer',n_clicks=0,style={'margin-top':10})],
+                             className="d-md-flex justify-content-md-end"),
+                ]),
+                html.Br(),
+                html.Div([
+                    dbc.Label('Substrate'),
+                    dcc.Dropdown(id='substrate',options=[{'label':mat[1],'value':mat[0]} for mat in db.get_material_list()]),
+                    dbc.InputGroup([
+                        dbc.InputGroupText('Thcikness'),
+                        dbc.Input(id='substrate-thickness',type='number',min=0),
+                        dbc.InputGroupText('um')
+                    ], style={'padding-top':10}),
+                ]),
 
-layout = dbc.Container([
-    html.H2('Spectra'),
-    dbc.Row(
-    [
-        dbc.Col([
-            dbc.Tabs([
-                dbc.Tab(dcc.Graph(id='graph-reflect'),label='Reflectance'),
-                dbc.Tab(dcc.Graph(id='graph-trans'),label='Transmittance'),
-                dbc.Tab(dcc.Graph(id='graph-reflect-with-back'),label='Reflectance(with back reflection)')
-            ])
-        ]),
-        dbc.Col([
-            html.Div([
-                dbc.Label(id='label-angle'),
-                dcc.Slider(id='slider-angle',min=0,max=89.9,step=0.1,value=0,marks={0:'0',5:'5',12:'12',45:'45'}),
-            ]),
-            html.Br(),
-            html.Div([
-                dbc.Label('Layers'),
-                dash_table.DataTable(id='table-layer',
-                                     data=[],
-                                     columns=[{'id':'id','name':'Material','presentation':'dropdown'},
-                                              {'id':'thickness','name':'Thickness','type':'numeric'}],
-                                     style_header={'textAlign':'left'},
-                                     style_cell={'height':0},
-                                     style_cell_conditional=[{
-                                        'if':{'column_id':'name'},'textAlign':'left'
-                                     }],
-                                     editable=True,
-                                     row_deletable=True,
-                                     dropdown={
-                                        'id':{
-                                            'options':[{'label':mat[1],'value':mat[0]} for mat in db.get_material_list()]
-                                        }
-                                     }
-                ),
-                html.Div([dbc.Button('Add Layer',id='button-add-layer',n_clicks=0,style={'margin-top':10})],
-                         className="d-md-flex justify-content-md-end"),
-            ]),
-            html.Br(),
-            html.Div([
-                dbc.Label('Substrate'),
-                dcc.Dropdown(id='substrate',options=[{'label':mat[1],'value':mat[0]} for mat in db.get_material_list()]),
-                dbc.InputGroup([
-                    dbc.InputGroupText('Thcikness'),
-                    dbc.Input(id='substrate-thickness',type='number',min=0),
-                    dbc.InputGroupText('um')
-                ], style={'padding-top':10}),
-            ])
-        ],width=3)
-    ]
-    )
-])
+            ],width=3)
+        ]
+        )
+    ])
+    return layout
+
+layout = serve_layout
 
 @callback(
     Output('label-angle','children'),
