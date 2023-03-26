@@ -32,7 +32,7 @@ layout = dbc.Container([
                 dbc.Label('Layers'),
                 dash_table.DataTable(id='table-layer',
                                      data=[],
-                                     columns=[{'id':'name','name':'Material','presentation':'dropdown'},
+                                     columns=[{'id':'id','name':'Material','presentation':'dropdown'},
                                               {'id':'thickness','name':'Thickness','type':'numeric'}],
                                      style_header={'textAlign':'left'},
                                      style_cell={'height':0},
@@ -42,7 +42,7 @@ layout = dbc.Container([
                                      editable=True,
                                      row_deletable=True,
                                      dropdown={
-                                        'name':{
+                                        'id':{
                                             'options':[{'label':mat[1],'value':mat[0]} for mat in db.get_material_list()]
                                         }
                                      }
@@ -75,21 +75,33 @@ layout = dbc.Container([
     Input('substrate-thickness','value'),
     Input('table-layer','data')
 )
-def update_angle(angle,substrate,thickness,layers):
+def update_spectra(angle,substrate,thickness,layers):
     fig_ref1 = go.Figure()
     fig_ref2 = go.Figure()
     fig_trans = go.Figure()
     ns = []
     ds = []
     if substrate is not None:
-        wl_min,wl_max = db.get_range(substrate)
         step=10
-        wl = np.arange(wl_min,wl_max,step)
-        n0 = 1
-        n2 = 1
-        n1 = np.array(db.fitted_opticalindex(substrate,wl_min,wl_max,step))
+        wl_min,wl_max = db.get_range(substrate)
+        if layers is not None:
+            for layer in layers:
+                if layer['id']  != '' and layer['thickness'] != '':
+                    a_min,a_max = db.get_range(layer['id'])
+                    wl_min = max(wl_min,a_min)
+                    wl_max = min(wl_max,a_max)
+            wl = np.arange(wl_min,wl_max,step)
+            for layer in layers:
+                if layer['id']  != '' and layer['thickness'] != '':
+                    ns.append(db.fitted_opticalindex(layer['id'],wl_min,wl_max,step))
+                    ds.append(layer['thickness'])
+        else:
+            wl = np.arange(wl_min,wl_max,step)
+        n1 = db.fitted_opticalindex(substrate,wl_min,wl_max,step)
+        n0=1
+        n2=1
         if thickness is not None:            
-            ref1,_,ref2,trans = op.calc_spectra(n0,n1,n2,angle*np.pi/180 ,[],[],[],[],thickness,wl)
+            ref1,_,ref2,trans = op.calc_spectra(n0,n1,n2,angle*np.pi/180 ,ns,ds,[],[],thickness,wl)
             fig_ref1.add_trace(go.Scatter(x=wl,y=(ref1[0]+ref1[1])/2, mode='lines',name='average'))
             fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines',name='s-polarized'))
             fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines',name='p-polarized'))
@@ -101,7 +113,7 @@ def update_angle(angle,substrate,thickness,layers):
             fig_ref2.add_trace(go.Scatter(x=wl,y=ref2[1], mode='lines',name='p-polarized'))
         else:
             thickness=1
-            ref1,trans,_,_ = op.calc_spectra(n0,n1,n2,angle*np.pi/180 ,[],[],[],[],thickness,wl)
+            ref1,trans,_,_ = op.calc_spectra(n0,n1,n2,angle*np.pi/180 ,ns,ds,[],[],thickness,wl)
             fig_ref1.add_trace(go.Scatter(x=wl,y=(ref1[0]+ref1[1])/2, mode='lines',name='average'))
             fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[0], mode='lines',name='s-polarized'))
             fig_ref1.add_trace(go.Scatter(x=wl,y=ref1[1], mode='lines',name='p-polarized'))
